@@ -8,7 +8,7 @@ ofxbSerial is an ofSerial Wrapper to use serial port easily and simulate serial 
 2. You can omitt full path for serial port. ( ex. /dev/cu.usbmodem1441 --> /dev/cu.usb )
 3. Same as Arduino Serial Plotter, send your device data csv(comma separated value) format. ofxbSerial::getList() will get each data on vector<string>.
 
-![Example screenshot](/snapshot.png)
+![Example screenshot](/screenshot.png)
 
 ## Usage
 ```c++
