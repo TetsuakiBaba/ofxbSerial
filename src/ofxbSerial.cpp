@@ -1,6 +1,7 @@
 #include "ofxbSerial.h"
 
 
+
 void ofxbSerial::setup(string keyword_device_name, int baudrate)
 {
     // For dummy serial port
@@ -33,9 +34,10 @@ void ofxbSerial::setup(string keyword_device_name, int baudrate)
     }
 }
 
-void ofxbSerial::setDataType(int _data_type)
+void ofxbSerial::setDataType(int _data_type, int _size_of_data)
 {
     data_type = _data_type;
+    size_of_data = _size_of_data;
 }
 
 void ofxbSerial::setSamplingRate(int _sampling_rate)
@@ -67,6 +69,93 @@ int ofxbSerial::available(){
     }
 }
 
+string ofxbSerial::getLine()
+{
+    string s;
+    s.clear();
+    if( flg_dummy ){
+        if( available() > 0 ){
+            int d = read();
+            for( int i = 0; i < size_of_data; i++ ){
+                if( i == size_of_data-1 ){
+                    s = s + ofToString(d);
+                }
+                else{
+                    s = s + ofToString(d) + ",";
+                }
+            }
+
+        }
+    }
+    else if( flg_dummy == false ){
+        if( serial.available() > 0 ){
+            unsigned char c[256];
+            int ret;
+            ret = serial.readBytes(c, sizeof(c));
+            if( ret != OF_SERIAL_NO_DATA ){
+                buf.append((char*)c, ret);
+            }
+        }
+        
+        
+        int count_return = 0;
+        int count_data_add = 0;
+        bool flg_got_data = false;
+        for( int i = 0; i < buf.size(); i++ ){
+            if( buf[i] == 10 ){
+                i = buf.size();
+                count_data_add++;
+                flg_got_data = true;
+            }
+            else if( buf[i] == 13 ){
+                count_data_add++;
+            }
+            else{
+                s.push_back(buf[i]);
+                count_data_add++;
+            }
+        }
+        
+        if( flg_got_data == false ){
+            s.clear();
+        }
+        else{
+            for( int i = 0; i < count_data_add; i++ ){
+                buf.erase(buf.begin());
+            }
+        }
+    }
+
+    return s;
+}
+
+vector<string> ofxbSerial::getList()
+{
+    string _s = getLine();
+    vector<string> result;
+    result.clear();
+    
+    if( _s.length() == 0 ){
+        return result;
+    }
+
+    string str = "";
+    int pos = 0;
+    for( int i = 0; i < _s.length(); i++ ){
+        if( _s.at(i) == ',' ){
+            result.push_back(str);
+            str.clear();
+        }
+        else{
+            str = str + _s.at(i);
+        }
+    }
+    if( str.length() > 0 ){
+        result.push_back(str);
+    }
+    
+    return result;
+}
 
 int ofxbSerial::read()
 {
@@ -95,11 +184,7 @@ int ofxbSerial::read()
                 return 100*sin(theta);
                 break;
                 
-        }
-        
-
-
-
+        }        
     }
     else{
         return serial.readByte();

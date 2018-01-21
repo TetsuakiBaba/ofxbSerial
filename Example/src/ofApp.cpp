@@ -11,7 +11,20 @@ void ofApp::setup(){
          you can simulate serial port for testing something.
          */
         serial.setSamplingRate(200); // 200 Hz per sec
-        serial.setDataType(OFXBSERIAL_DATA_TYPE_SINE_1HZ);
+        
+        /*
+         Format of data stream is supposed to be a csv(Comma Separeted
+         Value) format, such as followings.
+         10, 1491
+         11, 1089
+         12, 1950
+         13, 8941
+         ..
+         ..
+         ..
+         */
+        serial.setDataType(OFXBSERIAL_DATA_TYPE_SINE_1HZ, // Data Type
+                           2); // How many number separated by a comma.
     }
     
     /*
@@ -30,8 +43,11 @@ void ofApp::setup(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
-    if( serial.available() > 0 ){
-        value.push_back(serial.read());
+    vector<string>result = serial.getList();
+    if( result.size() > 0 ){
+        value.push_back( ofToInt(result[0]) );
+        cout << result[0] << ", " << result[1] << endl;
+        
         while( value.size() > ofGetWidth()/2 ){
             value.erase(value.begin());
         }
@@ -55,25 +71,26 @@ void ofApp::draw(){
                  ofGetHeight()/2+value.at(i));
     }
     ofEndShape();
+    
 }
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
     switch( key ){
             case '1':
-            serial.setDataType(OFXBSERIAL_DATA_TYPE_RANDOM);
+            serial.setDataType(OFXBSERIAL_DATA_TYPE_RANDOM,2);
             break;
             case '2':
-            serial.setDataType(OFXBSERIAL_DATA_TYPE_NOISE);
+            serial.setDataType(OFXBSERIAL_DATA_TYPE_NOISE,2);
             break;
             case '3':
-            serial.setDataType(OFXBSERIAL_DATA_TYPE_SINE_1HZ);
+            serial.setDataType(OFXBSERIAL_DATA_TYPE_SINE_1HZ,2);
             break;
             case '4':
-            serial.setDataType(OFXBSERIAL_DATA_TYPE_SINE_10HZ);
+            serial.setDataType(OFXBSERIAL_DATA_TYPE_SINE_10HZ,2);
             break;
             case '5':
-            serial.setDataType(OFXBSERIAL_DATA_TYPE_SINE_100HZ);
+            serial.setDataType(OFXBSERIAL_DATA_TYPE_SINE_100HZ,2);
             break;
     }
 }

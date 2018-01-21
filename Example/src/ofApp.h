@@ -25,4 +25,5 @@ public:
 
     ofxbSerial serial;
     vector<int> value;
+
 };
