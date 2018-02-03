@@ -157,9 +157,13 @@ vector<string> ofxbSerial::getList()
     return result;
 }
 
+
 int ofxbSerial::read()
 {
     static double theta = 0.0;
+    static double theta_1 = 0.0;
+    static double theta_2 = 0.0;
+    static float x = 0.0;
     if( flg_dummy == true ){
         switch( data_type )
         {
@@ -167,21 +171,28 @@ int ofxbSerial::read()
                 return ofRandom(-100, 100);
                 break;
             case OFXBSERIAL_DATA_TYPE_NOISE:
-                static float x = 0.0;
                 x=x+0.1;
                 return 200*(ofNoise(x)-0.5);
                 break;
             case OFXBSERIAL_DATA_TYPE_SINE_1HZ:
-                theta = theta + 1*(2*3.14)/sampling_rate; // 1Hz
+                theta = theta + 1*(2*M_PI)/sampling_rate; // 1Hz
                 return 100*sin(theta);
                 break;
             case OFXBSERIAL_DATA_TYPE_SINE_10HZ:
-                theta = theta + 10*(2*3.14)/sampling_rate; // 10Hz
+                theta = theta + 10*(2*M_PI)/sampling_rate; // 10Hz
                 return 100*sin(theta);
                 break;
             case OFXBSERIAL_DATA_TYPE_SINE_100HZ:
-                theta = theta + 100*(2*3.14)/sampling_rate; // 100Hz
+                theta = theta + 100*(2*M_PI)/sampling_rate; // 100Hz
                 return 100*sin(theta);
+                break;
+            case OFXBSERIAL_DATA_TYPE_HEART:
+                x=x+0.001;
+                theta = theta + (0.5+(ofNoise(x))/2.0)*(2*M_PI)/sampling_rate;
+//                theta_1 = theta_1 + (0.8+ofNoise(x)/2)*(2*M_PI)/sampling_rate;
+                theta_2 = theta_2 + (1.5+ofNoise(x))*(2.0*M_PI)/sampling_rate;
+
+                return 200*sin(theta)+100*sin(theta_1)+100*sin(theta_2);
                 break;
                 
         }        

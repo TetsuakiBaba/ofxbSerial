@@ -7,6 +7,7 @@
 #define OFXBSERIAL_DATA_TYPE_SINE_10HZ 3
 #define OFXBSERIAL_DATA_TYPE_SINE_100HZ 4
 #define OFXBSERIAL_DATA_TYPE_NOISE 10
+#define OFXBSERIAL_DATA_TYPE_HEART 20
 
 class ofxbSerial{
 public:
@@ -30,5 +31,7 @@ public:
     
     string buf;
     unsigned long int timestamp;
+    
+
 };
 
